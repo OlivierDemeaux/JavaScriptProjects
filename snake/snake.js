@@ -12,7 +12,9 @@ class Snake{
     checkImpact(newRect) {
         for (let i = 0; i < this.tail.length; i++) {
             if (newRect.x == this.tail[i].x && newRect.y == this.tail[i].y) {
-                resetGame()
+                livesLeft--;
+                resetGame(livesLeft)
+
             }
         } 
     }
@@ -69,12 +71,16 @@ class Apple{
 
 
 var canvas = document.getElementById("canvas");
+var scoreboard = document.getElementById("scoreboard");
+
+var livesLeft = 3;
 
 var snake = new Snake(20, 20, 20);
 
 var apple = new Apple();
 
 var canvasContext = canvas.getContext('2d');
+var scoreboardCanvasContext = scoreboard.getContext('2d');
 
 window.onload = () => {
     gameLoop();
@@ -86,11 +92,17 @@ function gameLoop(){
 
 function show() {
     update();
-    draw();
+    if(livesLeft == 0) {
+        drawGameOver();
+    } else {
+        drawCanvas();
+        drawScoreboard();
+    }
 }
 
 function update(){
     canvasContext.clearRect(0,0, canvas.width, canvas.height)
+    scoreboardCanvasContext.clearRect(0, 0, scoreboard.width, scoreboard.height)
     snake.move();
     checkHitWall();
     eatApple();
@@ -116,17 +128,27 @@ function eatApple(){
     }
 }
 
-function draw(){
+function drawCanvas(){
     createRect(0,0,canvas.width, canvas.height, "black");
-    createRect(0,0,canvas.width, canvas.heigth);
     for(let i = 0; i < snake.tail.length; i++){
         createRect(snake.tail[i].x + 2.5, snake.tail[i].y + 2.5, snake.size - 5, snake.size - 5, "white");
-
     }
+    createRect(apple.x, apple.y, apple.size, apple.size, apple.color)
+}
+
+function drawGameOver(){
+    createRect(0,0,canvas.width, canvas.height, "black");
     canvasContext.font = "20px Arial";
     canvasContext.fillStyle = "#00FF42";
-    canvasContext.fillText("Score: " + (snake.tail.length - 1), canvas.width - 120, 18);
-    createRect(apple.x, apple.y, apple.size, apple.size, apple.color)
+    canvasContext.fillText("Game Over. Press 'r' to play again", 40 , 200);
+}
+
+function drawScoreboard(){
+    createRectScore(0, 0, scoreboard.width , scoreboard.height , "black");
+    scoreboardCanvasContext.font = "20px Arial";
+    scoreboardCanvasContext.fillStyle = "#00FF42";
+    scoreboardCanvasContext.fillText("Score: " + (snake.tail.length - 1), 10 , 25);
+    scoreboardCanvasContext.fillText("Lives: " + (livesLeft), 10 , 60);
 }
 
 function createRect(x,y,width,height,color){
@@ -134,7 +156,13 @@ function createRect(x,y,width,height,color){
     canvasContext.fillRect(x,y,width,height)
 }
 
-function resetGame(){
+function createRectScore(x, y, width, height, color){
+    scoreboardCanvasContext.fillStyle = color;
+    scoreboardCanvasContext.fillRect(x,y,width,height)
+}
+
+function resetGame(x){
+    livesLeft = x;
     snake = new Snake(20, 20, 20);
     apple = new Apple();
 }
@@ -154,7 +182,7 @@ window.addEventListener("keydown", (event)=> {
             snake.rotateX = 0;
             snake.rotateY = 1;
         } else if(event.keyCode == 82){
-            resetGame()
+            resetGame(3)
         }
     }, 1)
 })
