@@ -12,7 +12,7 @@ class Snake{
     checkImpact(newRect) {
         for (let i = 0; i < this.tail.length; i++) {
             if (newRect.x == this.tail[i].x && newRect.y == this.tail[i].y) {
-                console.log("impact");
+                resetGame()
             }
         } 
     }
@@ -92,8 +92,8 @@ function show() {
 function update(){
     canvasContext.clearRect(0,0, canvas.width, canvas.height)
     snake.move();
-    eatApple();
     checkHitWall();
+    eatApple();
 }
 
 function checkHitWall(){
@@ -134,6 +134,11 @@ function createRect(x,y,width,height,color){
     canvasContext.fillRect(x,y,width,height)
 }
 
+function resetGame(){
+    snake = new Snake(20, 20, 20);
+    apple = new Apple();
+}
+
 window.addEventListener("keydown", (event)=> {
     setTimeout(() => {
         if(event.keyCode == 37 && snake.rotateX != 1){
@@ -148,6 +153,8 @@ window.addEventListener("keydown", (event)=> {
         } else if(event.keyCode == 40 && snake.rotateY != -1){
             snake.rotateX = 0;
             snake.rotateY = 1;
+        } else if(event.keyCode == 82){
+            resetGame()
         }
     }, 1)
 })
